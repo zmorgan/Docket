@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DocketApp.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="iconFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\Public\Public Pictures\DocketAppIcons</Value>
+    </Setting>
+    <Setting Name="iconNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="anchorLocation" Type="System.Windows.Forms.AnchorStyles" Scope="User">
+      <Value Profile="(Default)">Top</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
