@@ -11,5 +11,14 @@
     <Setting Name="anchorLocation" Type="System.Windows.Forms.AnchorStyles" Scope="User">
       <Value Profile="(Default)">Top</Value>
     </Setting>
+    <Setting Name="font" Type="System.Drawing.Font" Scope="User">
+      <Value Profile="(Default)">DejaVu Sans Condensed, 8.25pt</Value>
+    </Setting>
+    <Setting Name="backgroundColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Control</Value>
+    </Setting>
+    <Setting Name="fontColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Black</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

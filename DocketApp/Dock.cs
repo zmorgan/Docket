@@ -10,38 +10,39 @@ using System.IO;
 /* 
  * TO DO:
  * 
- * settings window
- * * background color (if i dont end up just using an image)
- * * text color/size/font
- * * dock location
- * * add option for dock to sit on task bar when they're on the same edge (currently sticks directly to edge, under task bar)
+ * Settings window
+ * * Background color (if i dont end up just using an image)
+ * * Text color/size/font
+ * * Dock location
  * * ???
  * 
- * drag and drop placement/rearrangement of items
- * let user drag multiple items to dock
- * hide/show dock depending on mouse movement near it
- * if user deletes a folder item whose contents are currently being displayed, remove the listview displaying those contents
- * make item removal delete associated icon image from icon folder
- * take icon from image thumbnail when adding image file?
- * make dock scale size to items
+ * Make dock sit on task bar when they're on the same edge of the screen (currently sticks directly to edge, under task bar)
  * 
- * what happens when the dock is full?
+ * Drag and drop placement/rearrangement of items
+ * Let user drag multiple items to dock
+ * Hide/show dock depending on mouse movement near it
+ * If user deletes a folder item whose contents are currently being displayed, remove the listview displaying those contents
+ * Make item removal delete associated icon image from icon folder
+ * Take icon from image thumbnail when adding image file?
+ * Make dock scale size to items
  * 
- * folder creation, everything else about installation
+ * What happens when the dock is full?
  * 
- * refine appearance in general (eg text placement, icon placement, color, etc)
- * * center everything, scale listview size to item list, center sublistview over parent item
+ * Folder creation, everything else about installation
  * 
- * stick app in tray instead of task bar
+ * Refine appearance in general (eg text placement, icon placement, color, etc)
+ * * Center everything, scale listview size to item list, center sublistview over parent item
  * 
- * displaying folders is kind of slow, look into that
- * also doesn't work if you move the mouse off the icon immediately after clicking
- * * might be a mouse down/up thing, moving the mouse before releasing it off the icon, not long enough to register as a drag instead of click?
- * fix flickering on PositionWindow()
+ * Stick app in tray instead of task bar
  * 
- * put in proper error messages
+ * Displaying folders is kind of slow, look into that
+ * Also doesn't work if you move the mouse off the icon immediately after clicking
+ * * Might be a mouse down/up thing, moving the mouse before releasing it off the icon, not long enough to register as a drag instead of click?
+ * Fix flickering on PositionWindow() - might be in lv.Top/Left = subListViewSpacing + 2;
  * 
- * organize these methods in the file
+ * Put in proper error messages
+ * 
+ * See if methods in code need more organizing?
  * 
  */
 
@@ -49,8 +50,8 @@ namespace DocketApp
 {
 	public partial class Dock : Form
 	{
-		static int subListViewSpacing = 15; // pixels between each level of the dock
-		static int itemRow = 110; // the width of the list views (if docking to left or right) or their height (if docking to top or bottom) 
+		static int subListViewSpacing = 15; // Pixels between each level of the dock
+		static int itemRow = 110; // The width of the list views (if docking to left or right) or their height (if docking to top or bottom) 
 
         string iconFolder = DocketApp.Properties.Settings.Default.iconFolder;
 		int iconNumber = DocketApp.Properties.Settings.Default.iconNumber;
@@ -67,24 +68,26 @@ namespace DocketApp
             InitializeComponent();
             
             DocketAppSettings _DocketAppSettings = new DocketAppSettings();
-            dockTree = _DocketAppSettings.DockedItems; // grab the stored item tree
+            dockTree = _DocketAppSettings.DockedItems; // Grab the stored item tree
             
-            lvRoot.Tag = new ListViewTag(dockTree); // create a tag for the root dock
+            lvRoot.Tag = new ListViewTag(dockTree); // Create a tag for the root dock
 
-            currentListView = lvRoot; // initialize this
+			// Load settings of the root list view - background color, font, etc
+			lvRoot.BackColor = DocketApp.Properties.Settings.Default.backgroundColor;
+			lvRoot.ForeColor = DocketApp.Properties.Settings.Default.fontColor;
+			lvRoot.Font = DocketApp.Properties.Settings.Default.font;
+
+			currentListView = lvRoot; // Initialize this
 
 			Settings();
 
-        }
+		}
 
         private void Dock_Load(object sender, EventArgs e)
         {
-            int h = lvRoot.Height;
-            int w = lvRoot.Width;
-            Point location = lvRoot.Location;
-            PaintListView(lvRoot);
             PositionWindow();
-        }
+			PaintListView(lvRoot);
+		}
 
         private void PaintListView(ListView list)
 		{
@@ -96,7 +99,7 @@ namespace DocketApp
 
             int count = 0;
 
-            foreach (DockedItem item in ((ListViewTag)list.Tag).item.docklist) // load the items in the item list into the listview, and their images into its image list
+            foreach (DockedItem item in ((ListViewTag)list.Tag).item.docklist) // Load the items in the item list into the listview, and their images into its image list
 			{
 				lvi = new ListViewItem();
 				lvi.Text = item.name;
@@ -107,7 +110,7 @@ namespace DocketApp
 					list.LargeImageList.Images.Add(Image.FromStream(fs));
 					fs.Close();
                 }
-                catch // if the image file wasn't found, wasn't actually an image, etc, use the default one
+                catch // If the image file wasn't found, wasn't actually an image, etc, use the default one
 				{
                     Image di = Properties.Resources.defaultIcon;
                     list.LargeImageList.Images.Add(di);
@@ -118,6 +121,7 @@ namespace DocketApp
 				list.Items.Add(lvi);
                 count++;
 			}
+
             list.EndUpdate();
 		}
         
@@ -132,7 +136,7 @@ namespace DocketApp
 			{
 				try
 				{
-					// attempt to run the file
+					// Attempt to run the file
 					Console.Write("\nrunning " + lvit.item.path);
 					System.Diagnostics.Process.Start(lvit.item.path);
 				}
@@ -142,12 +146,12 @@ namespace DocketApp
 					return;
 				}
 			}
-			else // make a new listview and display it
-                // might write a method for this?
+			else // Make a new listview and display it
+                // Might write a method for this?
 			{
                 if ((ListView)((ListViewTag)lv.Tag).subListView != null) cleanTree((ListView)((ListViewTag)lv.Tag).subListView);
 
-				// create the new list view
+				// Create the new list view
 				ListView subListView = new ListView();
 
 				subListView.Size = lv.Size;
@@ -158,17 +162,17 @@ namespace DocketApp
 				subListView.AllowDrop = lv.AllowDrop;
 				subListView.ContextMenuStrip = lv.ContextMenuStrip;
 
-                subListView.OwnerDraw = true;
+                subListView.OwnerDraw = true; // Allows custom drawing of items
 
 				subListView.Tag = new ListViewTag(lvit.item);
                 
-                // appearance
+                // Appearance
                 subListView.BackColor = lv.BackColor;
                 subListView.Font = lv.Font;
                 subListView.ForeColor = lv.ForeColor;
                 subListView.BorderStyle = lv.BorderStyle;
 
-				// add necessary events
+				// Add necessary events
 				subListView.ItemActivate += new System.EventHandler(this.ListView_ItemActivate);
 				subListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListView_DragDrop);
 				subListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.ListView_DragEnter);
@@ -195,13 +199,13 @@ namespace DocketApp
 			{
 				if (lv.GetItemAt(e.X, e.Y) != null) // if the click is on an item
 				{
-                    // the item will be focused, put it in the global variable for potential editing
+                    // The item will be focused, put it in the global variable for potential editing
                     itemHoverItem = lv.FocusedItem;
 					rightClickMenu.Items[0].Visible = true;
 					rightClickMenu.Items[1].Visible = true;
 					rightClickMenu.Items[2].Visible = true;
 				}
-				else // hide item-specific options
+				else // Hide item-specific options
 				{
 					rightClickMenu.Items[0].Visible = false;
 					rightClickMenu.Items[1].Visible = false;
@@ -209,7 +213,7 @@ namespace DocketApp
 				}
 				rightClickMenu.Show(Cursor.Position);
 			}
-            else { // any other mouse button (probably left)
+            else { // Any other mouse button (probably left)
                 ListView slv = (ListView)((ListViewTag)lv.Tag).subListView;
                 if (slv != null) cleanTree(slv);
             }
@@ -218,14 +222,14 @@ namespace DocketApp
 
         private void ListView_DrawItem(object sender, DrawListViewItemEventArgs e)
         {
-            ListViewItem lvi = e.Item; // the item to draw
-            Image img = lvi.ImageList.Images[lvi.ImageIndex]; // the image of the item
+            ListViewItem lvi = e.Item; // The item to draw
+            Image img = lvi.ImageList.Images[lvi.ImageIndex]; // The image of the item
 
-            int center = e.Bounds.Width/2 + e.Bounds.Left; // the horizontal center of the item's rectangle
+            int center = e.Bounds.Width/2 + e.Bounds.Left; // The horizontal center of the item's rectangle
 
             e.Graphics.DrawImageUnscaled(img, new Point(center-img.Width/2,e.Bounds.Y+e.Bounds.Height/10)); // draws the image
 
-            // draw the text in the bottom center of the item's rectangle
+            // Draw the text in the bottom center of the item's rectangle
             e.DrawText(TextFormatFlags.Bottom | TextFormatFlags.HorizontalCenter);
         }
 
@@ -237,8 +241,8 @@ namespace DocketApp
 				{
 					try
 					{
-						Image img = Image.FromFile(selectIcon.FileName); // check if the file name is an image
-                                                                         // dialog only gives image files as options but user can still enter any file manually
+						Image img = Image.FromFile(selectIcon.FileName); // Check if the file name is an image
+                                                                         // Dialog only gives image files as options but user can still enter any file manually
 
 						setDockedItemImage(img, ((ListViewTag)itemHoverItem.Tag).item);
 
@@ -252,7 +256,7 @@ namespace DocketApp
 						MessageBox.Show("Must select an image file.");
 					}
 				}
-				else // if the dialog was canceled, for example
+				else // If the dialog was canceled, for example
 				{
 					reopen = false;
 				}
@@ -299,7 +303,7 @@ namespace DocketApp
 		{
 			DockedItem item = (DockedItem)((ListViewTag)itemHoverItem.Tag).item;
 	
-			// let the user enter a new (non-empty) name
+			// Let the user enter a new (non-empty) name
 			PopupTextEntry popup = new PopupTextEntry();
 			popup.Text = "Enter Item Name";
 			popup.ShowDialog();
@@ -308,9 +312,44 @@ namespace DocketApp
 			Save(itemHoverItem.ListView);
 		}
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+
+		private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			PopupSettingsWindow swindow = new PopupSettingsWindow();
+
+			if (swindow.ShowDialog() == DialogResult.OK)
+			{
+				// Save the settings
+				DocketApp.Properties.Settings.Default.font = swindow.font;
+				DocketApp.Properties.Settings.Default.fontColor = swindow.fontColor;
+				DocketApp.Properties.Settings.Default.backgroundColor = swindow.backgroundColor;
+				DocketApp.Properties.Settings.Default.anchorLocation = swindow.anchorLocation;
+
+				DocketApp.Properties.Settings.Default.Save();
+				DocketApp.Properties.Settings.Default.Reload();
+
+				// Apply them to all ListView controls and repaint all ListView controls
+				ListView lv;
+				foreach (Control c in this.Controls)
+				{
+					if (c is ListView)
+					{
+						lv = (ListView)c;
+						lv.Font = swindow.font;
+						lv.ForeColor = swindow.fontColor;
+						lv.BackColor = swindow.backgroundColor;
+
+
+						lv.Refresh();
+					}
+				}
+				PositionWindow();
+			}
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //maybe add a confirmation here?
+            //Maybe add a confirmation here?
             Application.Exit();
         }
 
@@ -363,8 +402,8 @@ namespace DocketApp
                 img.Save(newImagePath);
             }
 
-            catch // initial creation can be shifted to install
-                    // so this should only ever execute if the directory has been deleted or the user chagnes it in the settings
+            catch // Initial creation can be shifted to install
+                    // So this should only ever execute if the directory has been deleted or the user changes it in the settings
             {
                 System.IO.Directory.CreateDirectory(iconFolder);
                 img.Save(newImagePath);
@@ -378,7 +417,7 @@ namespace DocketApp
 
         private void cleanTree(ListView lv) {
 
-            // attempts to remove the current listview and all of its children, recursively
+            // Attempts to remove the current ListView and all of its children, recursively
 
             if (((ListViewTag)lv.Tag).subListView != null) cleanTree(((ListViewTag)lv.Tag).subListView);
             this.Controls.Remove((Control)lv);
@@ -389,7 +428,7 @@ namespace DocketApp
 
         private void PositionWindow()
         {
-			// resizes and positions containing window on screen
+			// Resizes and positions containing window on screen
 
 			Rectangle controlRect = Screen.FromControl(lvRoot).Bounds;
 
@@ -398,18 +437,20 @@ namespace DocketApp
             switch (DocketApp.Properties.Settings.Default.anchorLocation)
             {
                 case AnchorStyles.Bottom:
-                    this.Height = 2; // can't set a non-empty form to 0 height, will set to 2 as minimum
+                    this.Height = 2; // Can't set a non-empty form to 0 height, will set to 2 as minimum
                     foreach (Control c in this.Controls)
                     {
 						if (c is ListView) {
 							lv = (ListView)c;
-                            lv.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+							lv.Size = new Size(itemRow * 6, itemRow); // Placeholder size; need to implement resizing based on # of items
+							lv.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
                             this.Height += (lv.Height + subListViewSpacing);
-                            lv.Top = subListViewSpacing + 2; // account for min height being 2
-                            if (lv.Width > this.Width) this.Width = lv.Width;
+                            lv.Top = subListViewSpacing + 2; // Account for min height being 2
+							lv.Left = 0;
+							if (lv.Width > this.Width) this.Width = lv.Width;
                         }
                     }
-                    this.Height -= 2; // and subtract it here
+                    this.Height -= 2; // Subtract the 2 here
                     this.Top = controlRect.Bottom - this.Height;
                     this.Left = (controlRect.Right - this.Width) / 2;
                     break;
@@ -421,10 +462,12 @@ namespace DocketApp
                         if (c is ListView)
                         {
                             lv = (ListView)c;
-                            lv.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+							lv.Size = new Size(itemRow, itemRow * 6);
+							lv.Anchor = AnchorStyles.Top | AnchorStyles.Right;
                             this.Width += (lv.Width + subListViewSpacing);
                             lv.Left = subListViewSpacing + 2;
-                            if(lv.Height > this.Height) this.Height = lv.Height;
+							lv.Top = 0;
+							if (lv.Height > this.Height) this.Height = lv.Height;
                         }
                     }
                     this.Width -= 2;
@@ -439,9 +482,11 @@ namespace DocketApp
 						if (c is ListView)
 						{
 							lv = (ListView)c;
-                            lv.Top = this.Height - 2;
+							lv.Size = new Size(itemRow * 6, itemRow);
+							lv.Top = this.Height - 2;
                             lv.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                             this.Height += (lv.Height + subListViewSpacing);
+							lv.Left = 0;
                             if (lv.Width > this.Width) this.Width = lv.Width;
                         }
 					}
@@ -457,9 +502,11 @@ namespace DocketApp
 						if (c is ListView)
 						{
 							lv = (ListView)c;
-                            lv.Left  = this.Width - 2;
+							lv.Size = new Size(itemRow, itemRow * 6);
+							lv.Left  = this.Width - 2;
                             lv.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                             this.Width += (lv.Width + subListViewSpacing);
+							lv.Top = 0;
                             if (lv.Height > this.Height) this.Height = lv.Height;
 						}
 					}
@@ -468,7 +515,7 @@ namespace DocketApp
                     this.Top = (controlRect.Bottom - this.Height) / 2;
                     break;
 
-                default: // defaults to bottom
+                default: // Defaults to bottom
                     this.Height = 2;
                     foreach (Control c in this.Controls)
                     {
@@ -488,7 +535,7 @@ namespace DocketApp
             }
 		}
 		
-        private void Save(ListView lv) // saves current version of the item tree and repaints the passed list view, which may have been edited
+        private void Save(ListView lv) // Saves current version of the item tree and repaints the passed list view, which may have been edited
 		{
 			_DocketAppSettings.DockedItems = dockTree;
 			_DocketAppSettings.Save();
@@ -498,8 +545,8 @@ namespace DocketApp
 
 		private void Settings()
 		{
-			// temporary method that asks for certain settings
-			// these will eventually go in either the settings window or be selected at install
+			// Temporary method that asks for certain settings on startup
+			// These will eventually go in either the settings window or be selected at install
 			
 			PopupTextEntry p = new PopupTextEntry();
 
@@ -510,41 +557,9 @@ namespace DocketApp
 			{
 				DocketApp.Properties.Settings.Default.iconFolder = p.getTextBoxText();
 			}
-
-			p.Text = "Enter Dock Location";
-			p.setLabelText("Top, bottom, left, or right. Defaults to bottom.");
-			p.setTextBoxText("");
-			if (p.ShowDialog() != DialogResult.Cancel)
-			{
-				switch (p.getTextBoxText().ToLower())
-				{
-					case "top":
-						DocketApp.Properties.Settings.Default.anchorLocation = AnchorStyles.Top;
-						lvRoot.Size = new Size(itemRow*6, itemRow); // arbitrary sizes until i implement dynamic resizing based on contents
-						break;
-					case "bottom":
-						DocketApp.Properties.Settings.Default.anchorLocation = AnchorStyles.Bottom;
-						lvRoot.Size = new Size(itemRow*6, itemRow);
-						break;
-					case "left":
-						DocketApp.Properties.Settings.Default.anchorLocation = AnchorStyles.Left;
-						lvRoot.Size = new Size(itemRow, itemRow*6);
-						break;
-					case "right":
-						DocketApp.Properties.Settings.Default.anchorLocation = AnchorStyles.Right;
-						lvRoot.Size = new Size(itemRow, itemRow*6);
-						break;
-					default:
-						DocketApp.Properties.Settings.Default.anchorLocation = AnchorStyles.Bottom;
-						lvRoot.Size = new Size(itemRow*6, itemRow);
-						break;
-				}
-			}
 			DocketApp.Properties.Settings.Default.Save();
 			DocketApp.Properties.Settings.Default.Reload();
 		}
-
-
-    }
+	}
 }
 

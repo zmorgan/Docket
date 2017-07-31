@@ -55,6 +55,12 @@
     </Compile>
     <Compile Include="DocketAppSettings.cs" />
     <Compile Include="ListViewTag.cs" />
+    <Compile Include="PopupSettingsWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopupSettingsWindow.Designer.cs">
+      <DependentUpon>PopupSettingsWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="PopupTextEntry.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,9 @@
     <EmbeddedResource Include="Dock.resx">
       <DependentUpon>Dock.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PopupSettingsWindow.resx">
+      <DependentUpon>PopupSettingsWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PopupTextEntry.resx">
       <DependentUpon>PopupTextEntry.cs</DependentUpon>

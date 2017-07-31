@@ -13,7 +13,7 @@ namespace DocketApp
 		[SettingsSerializeAs(System.Configuration.SettingsSerializeAs.Binary)]
 		[DefaultSettingValue("")]
 
-		public System.Collections.ArrayList DockedItems // the entire tree of docked items, as a simple list
+		public System.Collections.ArrayList DockedItems // the entire tree of docked items, as a list
 		{
 			get
 			{
@@ -24,6 +24,5 @@ namespace DocketApp
 				this["DockedItems"] = (System.Collections.ArrayList)value;
 			}
 		}
-
 	}
 }
